@@ -153,6 +153,14 @@ import { IClientModel, loadClientClass } from "./db/models/Client";
 import { IClientDocument } from "./db/models/definitions/client";
 import { IEntityTagModel, loadEntityTagClass } from './db/models/EntityTags';
 import { IEntityTagDocument } from './db/models/definitions/entity_tags';
+import { IDealStageModel, loadDealStageClass } from './db/models/DealStages';
+import { IDealStageDocument } from './db/models/definitions/deal_stages';
+import { IPipelineModel, loadPipelineClass } from './db/models/Pipelines';
+import { IPipelineDocument } from './db/models/definitions/pipelines';
+import { IDealModel, loadDealClass } from './db/models/Deals';
+import { IDealDocument } from './db/models/definitions/deals';
+import { IDealProductModel, loadDealProductClass } from './db/models/DealProducts';
+import { IDealProductDocument } from './db/models/definitions/deal_products';
 
 export interface IModels {
   Users: IUserModel;
@@ -196,6 +204,10 @@ export interface IModels {
   Clients: IClientModel;
   ExchangeRates: IExchangeRateModel;
   EntityTags: IEntityTagModel;
+  DealStages: IDealStageModel;
+  Pipelines: IPipelineModel;
+  Deals: IDealModel;
+  DealProducts: IDealProductModel;
 }
 
 export interface IContext extends IMainContext {
@@ -389,6 +401,11 @@ export const loadClasses = (
     'entity_tags',
     loadEntityTagClass(models)
   );
+
+  models.DealStages = db.model<IDealStageDocument, IDealStageModel>('deal_stages', loadDealStageClass(models));
+  models.Pipelines = db.model<IPipelineDocument, IPipelineModel>('pipelines', loadPipelineClass(models));
+  models.Deals = db.model<IDealDocument, IDealModel>('deals', loadDealClass(models));
+  models.DealProducts = db.model<IDealProductDocument, IDealProductModel>('deal_products', loadDealProductClass(models));
 
   return models;
 };
