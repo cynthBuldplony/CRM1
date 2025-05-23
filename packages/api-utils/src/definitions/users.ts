@@ -51,8 +51,8 @@ export interface IUser {
   groupIds?: string[];
   deviceTokens?: string[];
   code?: string;
-  doNotDisturb?: string;
-  isSubscribed?: string;
+  doNotDisturb?: boolean; // Type changed to boolean
+  isSubscribed?: boolean; // Type changed to boolean
   sessionCode?: string;
   isShowNotification?: boolean;
   score?: number;
@@ -187,15 +187,15 @@ export const userSchema = schemaWrapper(
     }),
     code: field({ type: String }),
     doNotDisturb: field({
-      type: String,
+      type: Boolean, // Type changed to Boolean
       optional: true,
-      default: 'No',
+      default: false, // Default changed to false
       label: 'Do not disturb',
     }),
     isSubscribed: field({
-      type: String,
+      type: Boolean, // Type changed to Boolean
       optional: true,
-      default: 'Yes',
+      default: true, // Default changed to true
       label: 'Subscribed',
     }),
     isShowNotification: field({

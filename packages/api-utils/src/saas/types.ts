@@ -8,7 +8,7 @@ export interface IOrganization {
   // teamMembersLimit: number; // Removed
   interval: string;
   charge: any;
-  size?: string; // Added
+  size?: string; 
 
   logo?: string;
   favicon?: string;
@@ -30,9 +30,20 @@ export interface IOrganization {
   // New fields
   legal_name?: string;
   tax_id?: string;
-  address?: any; 
-  billing_address?: any;
+  address?: IAddress; 
+  billing_address?: IAddress;
   website?: string;
   primary_color?: string;
   secondary_color?: string;
+  annualRevenue?: number; // Added
+}
+
+// New IAddress interface
+export interface IAddress {
+  street1?: string;
+  street2?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
 }

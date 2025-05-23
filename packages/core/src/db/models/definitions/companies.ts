@@ -91,7 +91,7 @@ export const companySchema = schemaWrapper(
     primaryName: field({
       type: String,
       label: "Name",
-      optional: true,
+      required: true, // Changed from optional: true
       esType: "keyword",
       index: true
     }),
@@ -135,12 +135,14 @@ export const companySchema = schemaWrapper(
       optional: true
     }),
 
-    parentCompanyId: field({ // Keeping existing parentCompanyId as is
-      type: String,
-      optional: true,
-      label: "Parent Company"
+    parentCompanyId: field({ 
+      type: Schema.Types.ObjectId, 
+      ref: 'companies', 
+      optional: true, 
+      index: true, 
+      label: "Parent Company ID" 
     }),
-    subsidiaries: field({ type: [String], optional: true, label: 'Subsidiaries' }), // New
+    subsidiaries: field({ type: [Schema.Types.ObjectId], ref: 'companies', optional: true, label: 'Subsidiaries' }), // New
 
     primaryEmail: field({
       type: String,
@@ -168,7 +170,7 @@ export const companySchema = schemaWrapper(
     billing_address: field({ type: Object, optional: true, label: 'Billing Address' }), // New
     shipping_address: field({ type: Object, optional: true, label: 'Shipping Address' }), // New
 
-    ownerId: field({ type: String, optional: true }),
+    ownerId: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, index: true }),
 
     status: field({
       type: String,
@@ -203,6 +205,7 @@ export const companySchema = schemaWrapper(
     source: field({ type: String, optional: true, label: 'Source' }), // New
     last_activity_date: field({ type: Date, optional: true, label: 'Last Activity Date' }), // New
     total_deal_value: field({ type: Number, optional: true, default: 0, label: 'Total Deal Value' }), // New
+    created_by: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, index: true, label: "Created By User ID" }), // New
     doNotDisturb: field({
       type: String,
       optional: true,

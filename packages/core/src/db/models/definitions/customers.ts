@@ -104,6 +104,7 @@ export interface ICustomer {
   referral_source?: string; // New
   first_seen?: Date; // New
   interaction_count?: number; // New
+  companyEmployments?: ICompanyEmployment[]; // New for contact-company relationship
 
   // TODO migrate after remove 1row
   companyIds?: string[];
@@ -169,6 +170,23 @@ export const visitorContactSchema = new Schema(
   },
   { _id: false }
 );
+
+// New ICompanyEmployment interface and companyEmploymentSchema sub-schema
+export interface ICompanyEmployment {
+  companyId: string; // Will store ObjectId, ref to Company model
+  role?: string;
+  isPrimary?: boolean;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+const companyEmploymentSchema = new Schema({
+  companyId: { type: Schema.Types.ObjectId, ref: 'companies', required: true, index: true }, // Changed ref to 'companies'
+  role: { type: String, optional: true },
+  isPrimary: { type: Boolean, optional: true, default: false },
+  startDate: { type: Date, optional: true },
+  endDate: { type: Date, optional: true }
+}, { _id: false });
 
 const getEnum = (fieldName: string): string[] => {
   return CUSTOMER_SELECT_OPTIONS[fieldName].map(option => option.value);
@@ -399,7 +417,7 @@ export const customerSchema = schemaWrapper(
     industry: field({ type: String, optional: true, label: 'Industry' }),
     lead_score: field({ type: Number, optional: true, default: 0, label: 'Lead Score' }),
     lifecycle_stage: field({ type: String, optional: true, label: 'Lifecycle Stage', enum: ['subscriber', 'lead', 'marketing_qualified_lead', 'sales_qualified_lead', 'opportunity', 'customer', 'evangelist', 'other'], default: 'lead' }),
-    account_manager_id: field({ type: String, optional: true, label: 'Account Manager ID' }),
+    account_manager_id: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, index: true, label: "Account Manager ID" }),
     relationship_strength: field({ type: String, optional: true, label: 'Relationship Strength', enum: ['cold', 'warm', 'hot'], default: 'warm' }),
     last_contact_date: field({ type: Date, optional: true, label: 'Last Contact Date' }),
     next_contact_date: field({ type: Date, optional: true, label: 'Next Contact Date' }),
@@ -411,6 +429,8 @@ export const customerSchema = schemaWrapper(
     referral_source: field({ type: String, optional: true, label: 'Referral Source' }),
     first_seen: field({ type: Date, optional: true, label: 'First Seen At' }),
     interaction_count: field({ type: Number, optional: true, default: 0, label: 'Interaction Count' }),
+  companyEmployments: field({ type: [companyEmploymentSchema], optional: true, label: "Company Employments" }), // New
+  created_by: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, index: true, label: "Created By User ID" }), // New
 
   }, { timestamps: true }) // Added timestamps:true
 );

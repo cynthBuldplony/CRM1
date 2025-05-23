@@ -22,12 +22,12 @@ export interface IPipelineDocument extends IPipeline, Document {
 export const pipelineSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
-    workspace_id: field({ type: String, required: true, index: true, label: "Workspace ID" }),
+    workspace_id: field({ type: Schema.Types.ObjectId, ref: 'brands', required: true, index: true, label: "Workspace ID" }),
     name: field({ type: String, required: true, label: "Name" }),
     description: field({ type: String, optional: true, label: "Description" }),
-    stages: field({ type: [String], optional: true, label: "Stage IDs" }), // Array of DealStage._id
+    stages: field({ type: [Schema.Types.ObjectId], ref: 'deal_stages', optional: true, label: "Stage IDs" }), // Array of DealStage._id
     is_default: field({ type: Boolean, optional: true, default: false, label: "Is Default Pipeline" }),
-    created_by: field({ type: String, optional: true, label: "Created By" }),
+    created_by: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, label: "Created By" }),
   }, { timestamps: true }), // Enable Mongoose's automatic createdAt and updatedAt fields
   'erxes_pipelines' // Cache key, if used by schemaHooksWrapper
 );

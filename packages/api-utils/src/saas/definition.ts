@@ -1,6 +1,17 @@
 import * as mongoose from 'mongoose';
 import { PROMO_CODE_TYPE } from '../saas/constants';
 
+// Common Address Sub-Schema
+const addressSchemaDefinition = {
+  street1: { type: String, optional: true },
+  street2: { type: String, optional: true },
+  city: { type: String, optional: true },
+  state: { type: String, optional: true },
+  postalCode: { type: String, optional: true },
+  country: { type: String, optional: true },
+};
+const addressSchema = new mongoose.Schema(addressSchemaDefinition, { _id: false });
+
 export const ORGANIZATION_PLAN = {
   LIFETIME: 'lifetime',
   FREE: 'free',
@@ -23,7 +34,7 @@ const cronLastExecutedDateSchema = new mongoose.Schema(
 );
 
 export const organizationsSchema = new mongoose.Schema({
-  name: { type: String },
+  name: { type: String, required: true },
   logo: { type: String },
   icon: { type: String },
   iconColor: { type: String },
@@ -37,7 +48,7 @@ export const organizationsSchema = new mongoose.Schema({
   subdomain: { type: String },
   ownerId: { type: String },
   charge: { type: Object },
-  promoCodes: { type: [String] },
+  promoCodes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'promo_codes', optional: true }],
   partnerKey: { type: String },
   lastActiveDate: { type: Date },
   createdAt: { type: Date },
@@ -62,7 +73,7 @@ export const organizationsSchema = new mongoose.Schema({
   // teamSize: { type: String }, // Removed
   size: { type: String, enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'], optional: true, label: 'Organization Size' },
   industry: { type: String },
-  annualRevenue: { type: String },
+  annualRevenue: { type: Number, optional: true },
   experienceId: { type: String },
   onboardingDone: { type: Boolean },
   customDomainStatus: { type: Object },
@@ -73,8 +84,8 @@ export const organizationsSchema = new mongoose.Schema({
   // New fields
   legal_name: { type: String, optional: true },
   tax_id: { type: String, optional: true },
-  address: { type: mongoose.Schema.Types.Mixed, optional: true },
-  billing_address: { type: mongoose.Schema.Types.Mixed, optional: true },
+  address: { type: addressSchema, optional: true },
+  billing_address: { type: addressSchema, optional: true },
   website: { type: String, optional: true },
   primary_color: { type: String, optional: true },
   secondary_color: { type: String, optional: true },

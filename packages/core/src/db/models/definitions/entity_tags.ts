@@ -19,10 +19,10 @@ export const entityTagSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     workspace_id: field({ type: String, required: true, index: true, label: "Workspace ID" }),
-    tag_id: field({ type: String, required: true, index: true, label: "Tag ID" }), // References Tags._id
-    entity_id: field({ type: String, required: true, index: true, label: "Entity ID" }),
+    tag_id: field({ type: Schema.Types.ObjectId, ref: 'erxes_tags', required: true, index: true, label: "Tag ID" }), // References Tags._id
+    entity_id: field({ type: Schema.Types.ObjectId, required: true, index: true, label: "Entity ID" }),
     entity_type: field({ type: String, required: true, index: true, label: "Entity Type" }), // e.g., 'customer', 'company', 'deal'
-    created_by: field({ type: String, optional: true, label: "Created By" }) // References Users._id
+    created_by: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, label: "Created By" }) // References Users._id
   }, { timestamps: true }), // Enable Mongoose timestamps
   'erxes_entity_tags' // Cache key for Redis, if applicable
 );

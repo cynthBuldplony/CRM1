@@ -28,6 +28,8 @@ export interface IDeal {
   priority?: string;   // ENUM: 'low', 'medium', 'high', 'urgent'
   customFieldsData?: ICustomField[];
   created_by?: string;
+  company_id?: string;      // ObjectId ref to Company collection
+  contact_ids?: string[];   // Array of ObjectId refs to Customer collection
 }
 
 // Interface for Deal document (includes Mongoose Document properties)
@@ -41,9 +43,9 @@ export interface IDealDocument extends IDeal, Document {
 export const dealSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
-    workspace_id: field({ type: String, required: true, index: true, label: "Workspace ID" }),
-    pipeline_id: field({ type: String, required: true, index: true, label: "Pipeline ID" }),
-    stage_id: field({ type: String, required: true, index: true, label: "Stage ID" }),
+    workspace_id: field({ type: Schema.Types.ObjectId, ref: 'brands', required: true, index: true, label: "Workspace ID" }),
+    pipeline_id: field({ type: Schema.Types.ObjectId, ref: 'pipelines', required: true, index: true, label: "Pipeline ID" }),
+    stage_id: field({ type: Schema.Types.ObjectId, ref: 'deal_stages', required: true, index: true, label: "Stage ID" }),
     name: field({ type: String, required: true, label: "Name" }),
     description: field({ type: String, optional: true, label: "Description" }),
     deal_type: field({ type: String, enum: ['new_business', 'existing_business', 'renewal', 'upsell', 'cross_sell'], default: 'new_business', label: "Deal Type" }),
@@ -53,13 +55,15 @@ export const dealSchema = schemaHooksWrapper(
     probability: field({ type: Number, optional: true, min: 0, max: 100, label: "Probability" }),
     expected_close_date: field({ type: Date, optional: true, label: "Expected Close Date" }),
     actual_close_date: field({ type: Date, optional: true, label: "Actual Close Date" }),
-    owner_id: field({ type: String, optional: true, index: true, label: "Owner ID" }), // References Users
-    team_id: field({ type: String, optional: true, index: true, label: "Team ID" }),    // References Teams
+    owner_id: field({ type: Schema.Types.ObjectId, ref: 'users', required: true, index: true, label: "Owner ID" }), 
+    team_id: field({ type: Schema.Types.ObjectId, ref: 'teams', optional: true, index: true, label: "Team ID" }),    
+    company_id: field({ type: Schema.Types.ObjectId, ref: 'companies', optional: true, index: true, label: "Company ID" }),
+    contact_ids: field({ type: [Schema.Types.ObjectId], ref: 'customers', optional: true, index: true, label: "Contact IDs" }),
     source: field({ type: String, optional: true, label: "Source" }),
     lost_reason: field({ type: String, optional: true, label: "Lost Reason" }),
     priority: field({ type: String, enum: ['low', 'medium', 'high', 'urgent'], default: 'medium', label: "Priority" }),
     customFieldsData: field({ type: [customFieldSchema], optional: true, label: "Custom Fields Data" }),
-    created_by: field({ type: String, optional: true, label: "Created By" }), // References Users
+    created_by: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, label: "Created By" }), 
   }, { timestamps: true }), 
   'erxes_deals' // Cache key
 );

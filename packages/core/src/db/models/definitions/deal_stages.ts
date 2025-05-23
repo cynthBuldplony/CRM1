@@ -27,8 +27,8 @@ export interface IDealStageDocument extends IDealStage, Document {
 export const dealStageSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
-    workspace_id: field({ type: String, required: true, index: true, label: "Workspace ID" }),
-    pipeline_id: field({ type: String, required: true, index: true, label: "Pipeline ID" }),
+    workspace_id: field({ type: Schema.Types.ObjectId, ref: 'brands', required: true, index: true, label: "Workspace ID" }),
+    pipeline_id: field({ type: Schema.Types.ObjectId, ref: 'pipelines', required: true, index: true, label: "Pipeline ID" }),
     name: field({ type: String, required: true, label: "Name" }),
     description: field({ type: String, optional: true, label: "Description" }),
     probability: field({ type: Number, optional: true, default: 0, label: "Probability" }),
@@ -37,7 +37,7 @@ export const dealStageSchema = schemaHooksWrapper(
     is_closed_won: field({ type: Boolean, optional: true, default: false, label: "Is Closed Won" }),
     is_closed_lost: field({ type: Boolean, optional: true, default: false, label: "Is Closed Lost" }),
     automation_triggers: field({ type: Schema.Types.Mixed, optional: true, label: "Automation Triggers" }),
-    created_by: field({ type: String, optional: true, label: "Created By" }),
+    created_by: field({ type: Schema.Types.ObjectId, ref: 'users', optional: true, label: "Created By" }),
   }, { timestamps: true }), // Enable Mongoose's automatic createdAt and updatedAt fields
   'erxes_deal_stages' // Cache key, if used by schemaHooksWrapper
 );

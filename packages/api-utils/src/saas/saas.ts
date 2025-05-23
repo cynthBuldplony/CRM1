@@ -11,6 +11,9 @@ import {
   promoCodeSchema,
   userSchema,
 } from './definition';
+import { userSessionSchema } from '../definitions/user_sessions'; // Adjust path if definition.ts barrel is used
+import { IUserSessionModel } from '../models/UserSessions'; // Adjust path as needed
+import { IUserSessionDocument } from '../definitions/user_sessions'; // For model typing
 import { IOrganization } from './types';
 import redis from '../redis';
 
@@ -23,6 +26,7 @@ export let coreModelEndpoints;
 export let coreModelPromoCodes;
 export let coreModelPlugins;
 export let coreModelExperiences;
+export let coreModelUserSessions;
 
 export const getCoreConnection = async (): Promise<void> => {
   if (coreModelOrganizations) {
@@ -52,6 +56,7 @@ export const getCoreConnection = async (): Promise<void> => {
   coreModelAddons = coreConnection.model('addons', addonSchema);
   coreModelBundles = coreConnection.model('bundles', bundleSchema);
   coreModelPlugins = coreConnection.model('plugins', pluginSchema);
+  coreModelUserSessions = coreConnection.model<IUserSessionDocument, IUserSessionModel>('user_sessions', userSessionSchema);
 };
 
 export let ORGANIZATION_ID_MAPPING: { [key: string]: string } = {};

@@ -23,8 +23,8 @@ export interface IDealProductDocument extends IDealProduct, Document {
 export const dealProductSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
-    deal_id: field({ type: String, required: true, index: true, label: "Deal ID" }),
-    product_id: field({ type: String, required: true, index: true, label: "Product ID" }),
+    deal_id: field({ type: Schema.Types.ObjectId, ref: 'deals', required: true, index: true, label: "Deal ID" }),
+    product_id: field({ type: Schema.Types.ObjectId, ref: 'products', required: true, index: true, label: "Product ID" }),
     quantity: field({ type: Number, optional: true, default: 1, label: "Quantity", min: 0 }),
     unit_price: field({ type: Number, optional: true, label: "Unit Price", min: 0 }), // Should align with product's price if linking actual products
     discount: field({ type: Number, optional: true, default: 0, label: "Discount Amount", min: 0 }),

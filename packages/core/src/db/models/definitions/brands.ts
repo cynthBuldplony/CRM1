@@ -69,7 +69,7 @@ export const brandSchema = schemaWrapper(
     }),
 
     // New fields for brandSchema
-    organizationId: field({ type: String, label: 'Organization ID', index: true }),
+    organizationId: field({ type: Schema.Types.ObjectId, ref: 'organizations', required: true, index: true, label: "Organization ID" }),
     slug: field({ type: String, label: 'Slug', unique: true, sparse: true }),
     logo_url: field({ type: String, optional: true, label: 'Logo URL' }),
     settings: field({ type: Schema.Types.Mixed, optional: true, default: {}, label: 'Settings' }),

@@ -161,6 +161,16 @@ import { IDealModel, loadDealClass } from './db/models/Deals';
 import { IDealDocument } from './db/models/definitions/deals';
 import { IDealProductModel, loadDealProductClass } from './db/models/DealProducts';
 import { IDealProductDocument } from './db/models/definitions/deal_products';
+import { IUserPreferenceModel, loadUserPreferenceClass } from './db/models/UserPreferences';
+import { IUserPreferenceDocument } from './db/models/definitions/user_preferences';
+import { IWorkspaceMemberModel, loadWorkspaceMemberClass } from './db/models/WorkspaceMembers';
+import { IWorkspaceMemberDocument } from './db/models/definitions/workspace_members';
+import { ITeamModel, loadTeamClass } from './db/models/Teams';
+import { ITeamDocument } from './db/models/definitions/teams';
+import { ITeamMemberModel, loadTeamMemberClass } from './db/models/TeamMembers';
+import { ITeamMemberDocument } from './db/models/definitions/team_members';
+import { IActivityModel, loadActivityClass } from './db/models/Activities';
+import { IActivityDocument } from './db/models/definitions/activities';
 
 export interface IModels {
   Users: IUserModel;
@@ -208,6 +218,11 @@ export interface IModels {
   Pipelines: IPipelineModel;
   Deals: IDealModel;
   DealProducts: IDealProductModel;
+  UserPreferences: IUserPreferenceModel;
+  WorkspaceMembers: IWorkspaceMemberModel;
+  Teams: ITeamModel;
+  TeamMembers: ITeamMemberModel;
+  Activities: IActivityModel;
 }
 
 export interface IContext extends IMainContext {
@@ -406,6 +421,11 @@ export const loadClasses = (
   models.Pipelines = db.model<IPipelineDocument, IPipelineModel>('pipelines', loadPipelineClass(models));
   models.Deals = db.model<IDealDocument, IDealModel>('deals', loadDealClass(models));
   models.DealProducts = db.model<IDealProductDocument, IDealProductModel>('deal_products', loadDealProductClass(models));
+  models.UserPreferences = db.model<IUserPreferenceDocument, IUserPreferenceModel>('user_preferences', loadUserPreferenceClass(models));
+  models.WorkspaceMembers = db.model<IWorkspaceMemberDocument, IWorkspaceMemberModel>('workspace_members', loadWorkspaceMemberClass(models));
+  models.Teams = db.model<ITeamDocument, ITeamModel>('teams', loadTeamClass(models));
+  models.TeamMembers = db.model<ITeamMemberDocument, ITeamMemberModel>('team_members', loadTeamMemberClass(models));
+  models.Activities = db.model<IActivityDocument, IActivityModel>('activities', loadActivityClass(models));
 
   return models;
 };
