@@ -298,6 +298,11 @@ export const loadCustomerClass = (models: IModels, subdomain: string) => {
 
       const pssDoc = await models.Customers.calcPSS(doc);
 
+      // TODO: Create EntityTags: Iterate over doc.tagIds if provided, and create entries in models.EntityTags.
+      // Required fields: entity_id (new customer's _id), entity_type ('customer'), tag_id, workspace_id (from doc or context), created_by (from user).
+      // Note: The actual doc.tagIds field is removed from the ICustomer interface and customerSchema.
+      // This comment serves as a placeholder for where the new EntityTags logic would be triggered if tag information is passed differently (e.g., in a separate parameter or within a nested object).
+
       const customer = await models.Customers.create({
         createdAt: new Date(),
         modifiedAt: new Date(),
@@ -377,6 +382,11 @@ export const loadCustomerClass = (models: IModels, subdomain: string) => {
         { _id },
         { $set: { ...doc, ...pssDoc, modifiedAt: new Date() } }
       );
+
+      // TODO: Update EntityTags: If doc.tagIds (or equivalent) is provided, compare with existing EntityTags for this customer.
+      // Create new EntityTags for added tags, and remove EntityTags for removed tags.
+      // Note: The actual doc.tagIds field is removed from the ICustomer interface and customerSchema.
+      // This comment serves as a placeholder for where the new EntityTags logic would be triggered if tag information is passed differently.
 
       return models.Customers.findOne({ _id }).lean();
     }
@@ -533,8 +543,16 @@ export const loadCustomerClass = (models: IModels, subdomain: string) => {
       // Checking duplicated fields of customer
       await models.Customers.checkDuplication(customerFields, customerIds);
 
+      // TODO: Merge EntityTags:
+      // 1. Collect all unique tag_id's from EntityTags of 'customerObjects' (ensure correct workspace_id, entity_type: 'customer').
+      //    This will require fetching EntityTags for each customerId in customerIds.
+      //    const allTagIdsFromEntityTags = new Set<string>();
+      //    for (const customerId of customerIds) {
+      //      const entityTags = await models.EntityTags.find({ entity_id: customerId, entity_type: 'customer', workspace_id: /* relevant workspace_id */ }).lean();
+      //      entityTags.forEach(et => allTagIdsFromEntityTags.add(et.tag_id));
+      //    }
+
       let scopeBrandIds: string[] = [];
-      let tagIds: string[] = [];
       let customFieldsData: ICustomField[] = [];
       let state: any = '';
 
@@ -568,11 +586,6 @@ export const loadCustomerClass = (models: IModels, subdomain: string) => {
             ...(customerObj.scopeBrandIds || []),
           ];
 
-          const customerTags: string[] = customerObj.tagIds || [];
-
-          // Merging customer's tag and companies into 1 array
-          tagIds = tagIds.concat(customerTags);
-
           // Merging emails, phones
           emails = [...emails, ...(customerObj.emails || [])];
           phones = [...phones, ...(customerObj.phones || [])];
@@ -588,7 +601,6 @@ export const loadCustomerClass = (models: IModels, subdomain: string) => {
 
       // Removing Duplicates
       scopeBrandIds = Array.from(new Set(scopeBrandIds));
-      tagIds = Array.from(new Set(tagIds));
 
       // Removing Duplicated Emails from customer
       emails = Array.from(new Set(emails));
@@ -600,7 +612,7 @@ export const loadCustomerClass = (models: IModels, subdomain: string) => {
           ...customerFields,
           scopeBrandIds,
           customFieldsData,
-          tagIds,
+          // tagIds, // This is removed
           mergedIds: customerIds,
           emails,
           phones,

@@ -72,7 +72,7 @@ export interface ITagModel extends Model<ITagDocument> {
   validateUniqueness(
     selector: any,
     name: string,
-    type: string
+    workspace_id: string
   ): Promise<boolean>;
 }
 
@@ -96,10 +96,10 @@ export const loadTagClass = models => {
     public static async validateUniqueness(
       selector: any,
       name: string,
-      type: string
+      workspace_id: string
     ): Promise<boolean> {
-      // required name and type
-      if (!name || !type) {
+      // required name and workspace_id
+      if (!name || !workspace_id) {
         return true;
       }
 
@@ -112,7 +112,7 @@ export const loadTagClass = models => {
 
       const obj = selector && (await models.Tags.findOne(selector));
 
-      const filter: any = { name, type };
+      const filter: any = { name, workspace_id };
 
       if (obj) {
         filter._id = { $ne: obj._id };
@@ -143,7 +143,7 @@ export const loadTagClass = models => {
       const isUnique = await models.Tags.validateUniqueness(
         null,
         doc.name,
-        doc.type
+        doc.workspace_id
       );
 
       if (!isUnique) {
@@ -170,10 +170,12 @@ export const loadTagClass = models => {
      * Update Tag
      */
     public static async updateTag(_id: string, doc: ITag) {
+      const tag = await models.Tags.getTag(_id); // Fetch existing tag first for workspace_id
+
       const isUnique = await models.Tags.validateUniqueness(
         { _id },
         doc.name,
-        doc.type
+        tag.workspace_id // Use existing tag's workspace_id as it's not expected to change
       );
 
       if (!isUnique) {
@@ -186,7 +188,7 @@ export const loadTagClass = models => {
         throw new Error("Cannot change tag");
       }
 
-      const tag = await models.Tags.getTag(_id);
+      // const tag = await models.Tags.getTag(_id); // Already fetched above
 
       // Generatingg  order
       const order = await this.generateOrder(parentTag, doc);

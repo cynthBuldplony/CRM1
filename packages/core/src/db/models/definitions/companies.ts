@@ -37,7 +37,6 @@ export interface ICompany {
   employees?: number;
   isSubscribed?: string;
   links?: ILink;
-  tagIds?: string[];
   customFieldsData?: ICustomField[];
   trackedData?: ICustomField[];
   website?: string;
@@ -63,13 +62,14 @@ export const companySchema = schemaWrapper(
     _id: field({ pkey: true }),
 
     createdAt: field({ type: Date, label: "Created at", esType: "date" }),
-    modifiedAt: field({ type: Date, label: "Modified at", esType: "date" }),
+    modifiedAt: field({ type: Date, label: "Modified at", esType: "date", index: true }),
 
     primaryName: field({
       type: String,
       label: "Name",
       optional: true,
-      esType: "keyword"
+      esType: "keyword",
+      index: true
     }),
 
     names: field({
@@ -179,13 +179,6 @@ export const companySchema = schemaWrapper(
       selectOptions: COMPANY_SELECT_OPTIONS.DO_NOT_DISTURB
     }),
     links: field({ type: Object, default: {}, label: "Links" }),
-
-    tagIds: field({
-      type: [String],
-      optional: true,
-      label: "Tags",
-      index: true
-    }),
 
     // Merged company ids
     mergedIds: field({

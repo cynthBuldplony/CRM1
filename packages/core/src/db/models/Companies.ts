@@ -250,6 +250,10 @@ export const loadCompanyClass = (models: IModels, subdomain) => {
         doc.customFieldsData
       );
 
+      // TODO: Create EntityTags: If tag information is provided (e.g., via a parameter other than doc.tagIds), create entries in models.EntityTags.
+      // Required fields: entity_id (new company's _id), entity_type ('company'), tag_id, workspace_id (from doc or context), created_by (from user).
+      // Note: The actual doc.tagIds field is removed from the ICompany interface and companySchema.
+
       const company = await models.Companies.create({
         ...doc,
         createdAt: new Date(),
@@ -301,6 +305,10 @@ export const loadCompanyClass = (models: IModels, subdomain) => {
         { $set: { ...doc, searchText, modifiedAt: new Date() } }
       );
 
+      // TODO: Update EntityTags: If tag information is provided, compare with existing EntityTags for this company.
+      // Create new EntityTags for added tags, and remove EntityTags for removed tags.
+      // Note: The actual doc.tagIds field is removed from the ICompany interface and companySchema.
+
       return models.Companies.findOne({ _id });
     }
 
@@ -337,9 +345,17 @@ export const loadCompanyClass = (models: IModels, subdomain) => {
       // Checking duplicated fields of company
       await this.checkDuplication(companyFields, companyIds);
 
+      // TODO: Merge EntityTags:
+      // 1. Collect all unique tag_id's from EntityTags of 'companyObjects' (ensure correct workspace_id, entity_type: 'company').
+      //    This will require fetching EntityTags for each companyId in companyIds.
+      //    const allTagIdsFromEntityTags = new Set<string>();
+      //    for (const companyId of companyIds) {
+      //      const entityTags = await models.EntityTags.find({ entity_id: companyId, entity_type: 'company', workspace_id: /* relevant workspace_id */ }).lean();
+      //      entityTags.forEach(et => allTagIdsFromEntityTags.add(et.tag_id));
+      //    }
+
       let scopeBrandIds: string[] = [];
       let customFieldsData: ICustomField[] = [];
-      let tagIds: string[] = [];
       let names: string[] = [];
       let emails: string[] = [];
       let phones: string[] = [];
@@ -348,7 +364,6 @@ export const loadCompanyClass = (models: IModels, subdomain) => {
       for (const companyId of companyIds) {
         const companyObj = await models.Companies.getCompany(companyId);
 
-        const companyTags = companyObj.tagIds || [];
         const companyNames = companyObj.names || [];
         const companyEmails = companyObj.emails || [];
         const companyPhones = companyObj.phones || [];
@@ -362,9 +377,6 @@ export const loadCompanyClass = (models: IModels, subdomain) => {
           ...customFieldsData,
           ...(companyObj.customFieldsData || [])
         ];
-
-        // Merging company's tag into 1 array
-        tagIds = tagIds.concat(companyTags);
 
         // Merging company names
         names = names.concat(companyNames);
@@ -383,7 +395,6 @@ export const loadCompanyClass = (models: IModels, subdomain) => {
       }
 
       // Removing Duplicates
-      tagIds = Array.from(new Set(tagIds));
       names = Array.from(new Set(names));
       emails = Array.from(new Set(emails));
       phones = Array.from(new Set(phones));

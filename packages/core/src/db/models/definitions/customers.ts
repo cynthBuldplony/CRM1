@@ -81,7 +81,6 @@ export interface ICustomer {
   links?: ILink;
   relatedIntegrationIds?: string[];
   integrationId?: string;
-  tagIds?: string[];
 
   // TODO migrate after remove 1row
   companyIds?: string[];
@@ -166,7 +165,7 @@ export const customerSchema = schemaWrapper(
     }),
 
     createdAt: field({ type: Date, label: "Created at", esType: "date" }),
-    modifiedAt: field({ type: Date, label: "Modified at", esType: "date" }),
+    modifiedAt: field({ type: Date, label: "Modified at", esType: "date", index: true }),
     avatar: field({ type: String, optional: true, label: "Avatar" }),
 
     firstName: field({ type: String, label: "First name", optional: true }),
@@ -193,7 +192,8 @@ export const customerSchema = schemaWrapper(
       type: String,
       label: "Primary Email",
       optional: true,
-      esType: "email"
+      esType: "email",
+      index: true
     }),
     emails: field({ type: [String], optional: true, label: "Emails" }),
     emailValidationStatus: field({
@@ -241,7 +241,7 @@ export const customerSchema = schemaWrapper(
       esType: "number"
     }),
 
-    ownerId: field({ type: String, optional: true }),
+    ownerId: field({ type: String, optional: true, index: true }),
     position: field({
       type: String,
       optional: true,
@@ -309,12 +309,6 @@ export const customerSchema = schemaWrapper(
       label: "Integration",
       index: true,
       esType: "keyword"
-    }),
-    tagIds: field({
-      type: [String],
-      optional: true,
-      index: true,
-      label: "Tags"
     }),
 
     // Merged customer ids

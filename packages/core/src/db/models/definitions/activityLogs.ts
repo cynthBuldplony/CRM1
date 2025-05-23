@@ -29,10 +29,11 @@ export const activityLogSchema = new Schema({
   contentType: field({ type: String, index: true }),
   action: field({ type: String, index: true }),
   content: Schema.Types.Mixed,
-  createdBy: field({ type: String, optional: true }),
+  createdBy: field({ type: String, optional: true, index: true }),
   createdAt: field({
     type: Date,
     required: true,
-    default: Date.now
+    default: Date.now,
+    index: true
   })
 });

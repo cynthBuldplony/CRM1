@@ -151,6 +151,8 @@ import {
 import { IExchangeRateDocument } from './db/models/definitions/exchangeRate';
 import { IClientModel, loadClientClass } from "./db/models/Client";
 import { IClientDocument } from "./db/models/definitions/client";
+import { IEntityTagModel, loadEntityTagClass } from './db/models/EntityTags';
+import { IEntityTagDocument } from './db/models/definitions/entity_tags';
 
 export interface IModels {
   Users: IUserModel;
@@ -193,6 +195,7 @@ export interface IModels {
   Reports: IReportModel;
   Clients: IClientModel;
   ExchangeRates: IExchangeRateModel;
+  EntityTags: IEntityTagModel;
 }
 
 export interface IContext extends IMainContext {
@@ -380,6 +383,11 @@ export const loadClasses = (
   models.ExchangeRates = db.model<IExchangeRateDocument, IExchangeRateModel>(
     'exchange_rates',
     loadExchangeRateClass(models, subdomain)
+  );
+
+  models.EntityTags = db.model<IEntityTagDocument, IEntityTagModel>(
+    'entity_tags',
+    loadEntityTagClass(models)
   );
 
   return models;
