@@ -14,11 +14,23 @@ export interface IBrand {
   memberIds?: string[];
   userId?: string;
   emailConfig?: IBrandEmailConfig;
+
+  // New fields for IBrand
+  organizationId?: string;
+  slug?: string;
+  logo_url?: string;
+  settings?: any;
+  plan?: string;
+  plan_limits?: any;
+  features?: any;
+  status?: string;
+  trial_ends_at?: Date;
 }
 
 export interface IBrandDocument extends IBrand, Document {
   _id: string;
   createdAt: Date;
+  updatedAt: Date; // Added for timestamps:true
 }
 
 // Mongoose schemas ===========
@@ -50,10 +62,22 @@ export const brandSchema = schemaWrapper(
       label: 'Description'
     }),
     userId: field({ type: String, label: 'Created by' }),
-    createdAt: field({ type: Date, label: 'Created at' }),
+    createdAt: field({ type: Date, label: 'Created at' }), // Mongoose will manage this via timestamps
     emailConfig: field({
       type: brandEmailConfigSchema,
       label: 'Email config'
-    })
-  })
+    }),
+
+    // New fields for brandSchema
+    organizationId: field({ type: String, label: 'Organization ID', index: true }),
+    slug: field({ type: String, label: 'Slug', unique: true, sparse: true }),
+    logo_url: field({ type: String, optional: true, label: 'Logo URL' }),
+    settings: field({ type: Schema.Types.Mixed, optional: true, default: {}, label: 'Settings' }),
+    plan: field({ type: String, enum: ['free', 'starter', 'professional', 'enterprise', 'custom'], default: 'free', label: 'Plan' }),
+    plan_limits: field({ type: Schema.Types.Mixed, optional: true, default: {}, label: 'Plan Limits' }),
+    features: field({ type: Schema.Types.Mixed, optional: true, default: {}, label: 'Features' }),
+    status: field({ type: String, enum: ['active', 'trial', 'suspended', 'cancelled'], default: 'trial', label: 'Status' }),
+    trial_ends_at: field({ type: Date, optional: true, label: 'Trial Ends At' }),
+
+  }, { timestamps: true }) // Added timestamps:true option
 );

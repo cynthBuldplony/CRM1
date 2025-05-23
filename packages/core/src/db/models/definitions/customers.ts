@@ -58,15 +58,21 @@ export interface ICustomer {
   firstName?: string;
   lastName?: string;
   middleName?: string;
+  prefix?: string;
+  suffix?: string;
   birthDate?: Date;
   sex?: number;
   primaryEmail?: string;
   emails?: string[];
+  email_2?: string; // New
   avatar?: string;
   primaryPhone?: string;
   phones?: string[];
+  fax?: string; // New
   primaryAddress?: IAddress;
   addresses?: IAddress[];
+  shipping_address?: IAddress; // New
+  billing_address?: IAddress; // New
 
   ownerId?: string;
   position?: string;
@@ -81,6 +87,23 @@ export interface ICustomer {
   links?: ILink;
   relatedIntegrationIds?: string[];
   integrationId?: string;
+  social_profiles?: any; // New
+  source?: string; // New
+  industry?: string; // New
+  lead_score?: number; // New
+  lifecycle_stage?: string; // New
+  account_manager_id?: string; // New
+  relationship_strength?: string; // New
+  last_contact_date?: Date; // New
+  next_contact_date?: Date; // New
+  email_opt_in?: boolean; // New
+  sms_opt_in?: boolean; // New
+  do_not_call?: boolean; // New
+  preferred_contact_method?: string; // New
+  communication_frequency?: string; // New
+  referral_source?: string; // New
+  first_seen?: Date; // New
+  interaction_count?: number; // New
 
   // TODO migrate after remove 1row
   companyIds?: string[];
@@ -114,7 +137,8 @@ export interface ICustomerDocument extends ICustomer, Document {
   score?: number;
   status?: string;
   createdAt: Date;
-  modifiedAt: Date;
+  // modifiedAt: Date; // Removed
+  updatedAt: Date; // Added
   deviceTokens?: string[];
   searchText?: string;
 }
@@ -165,12 +189,14 @@ export const customerSchema = schemaWrapper(
     }),
 
     createdAt: field({ type: Date, label: "Created at", esType: "date" }),
-    modifiedAt: field({ type: Date, label: "Modified at", esType: "date", index: true }),
+    // modifiedAt: field({ type: Date, label: "Modified at", esType: "date", index: true }), // Removed
     avatar: field({ type: String, optional: true, label: "Avatar" }),
 
+    prefix: field({ type: String, optional: true, label: 'Prefix' }),
     firstName: field({ type: String, label: "First name", optional: true }),
-    lastName: field({ type: String, label: "Last name", optional: true }),
     middleName: field({ type: String, label: "Middle name", optional: true }),
+    lastName: field({ type: String, label: "Last name", optional: true }),
+    suffix: field({ type: String, optional: true, label: 'Suffix' }),
 
     birthDate: field({
       type: Date,
@@ -196,6 +222,7 @@ export const customerSchema = schemaWrapper(
       index: true
     }),
     emails: field({ type: [String], optional: true, label: "Emails" }),
+    email_2: field({ type: String, optional: true, label: 'Secondary Email' }),
     emailValidationStatus: field({
       type: String,
       enum: getEnum("EMAIL_VALIDATION_STATUSES"),
@@ -211,6 +238,7 @@ export const customerSchema = schemaWrapper(
       optional: true
     }),
     phones: field({ type: [String], optional: true, label: "Phones" }),
+    fax: field({ type: String, optional: true, label: 'Fax' }),
 
     primaryAddress: field({
       type: Object,
@@ -218,6 +246,8 @@ export const customerSchema = schemaWrapper(
       optional: true
     }),
     addresses: field({ type: [Object], optional: true, label: "Addresses" }),
+    shipping_address: field({ type: Object, optional: true, label: 'Shipping Address' }),
+    billing_address: field({ type: Object, optional: true, label: 'Billing Address' }),
 
     phoneValidationStatus: field({
       type: String,
@@ -361,6 +391,26 @@ export const customerSchema = schemaWrapper(
       esType: "number"
     }),
     visitorId: field({ type: String, optional: true }),
-    data: field({ type: Object, optional: true })
-  })
+    data: field({ type: Object, optional: true }),
+
+    // New fields from step 3 of prompt
+    social_profiles: field({ type: Schema.Types.Mixed, optional: true, default: {}, label: 'Social Profiles' }),
+    source: field({ type: String, optional: true, label: 'Lead Source' }),
+    industry: field({ type: String, optional: true, label: 'Industry' }),
+    lead_score: field({ type: Number, optional: true, default: 0, label: 'Lead Score' }),
+    lifecycle_stage: field({ type: String, optional: true, label: 'Lifecycle Stage', enum: ['subscriber', 'lead', 'marketing_qualified_lead', 'sales_qualified_lead', 'opportunity', 'customer', 'evangelist', 'other'], default: 'lead' }),
+    account_manager_id: field({ type: String, optional: true, label: 'Account Manager ID' }),
+    relationship_strength: field({ type: String, optional: true, label: 'Relationship Strength', enum: ['cold', 'warm', 'hot'], default: 'warm' }),
+    last_contact_date: field({ type: Date, optional: true, label: 'Last Contact Date' }),
+    next_contact_date: field({ type: Date, optional: true, label: 'Next Contact Date' }),
+    email_opt_in: field({ type: Boolean, optional: true, default: true, label: 'Email Opt-In' }),
+    sms_opt_in: field({ type: Boolean, optional: true, default: false, label: 'SMS Opt-In' }),
+    do_not_call: field({ type: Boolean, optional:true, default: false, label: 'Do Not Call' }),
+    preferred_contact_method: field({ type: String, optional: true, label: 'Preferred Contact Method', enum: ['email', 'phone', 'text', 'mail'], default: 'email' }),
+    communication_frequency: field({ type: String, optional: true, label: 'Communication Frequency', enum: ['daily', 'weekly', 'monthly', 'quarterly'], default: 'weekly' }),
+    referral_source: field({ type: String, optional: true, label: 'Referral Source' }),
+    first_seen: field({ type: Date, optional: true, label: 'First Seen At' }),
+    interaction_count: field({ type: Number, optional: true, default: 0, label: 'Interaction Count' }),
+
+  }, { timestamps: true }) // Added timestamps:true
 );

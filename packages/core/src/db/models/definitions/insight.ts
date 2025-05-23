@@ -53,11 +53,12 @@ export interface IDashboard {
   serviceTypes?: string[];
   charts?: IChartDocument[];
 
-  createdAt: Date;
+  createdAt: Date; // Managed by timestamps
   createdBy: string;
 
-  updatedAt: Date;
+  updatedAt: Date; // Managed by timestamps
   updatedBy: string;
+  workspace_id?: string; // New
 }
 
 export interface IDashboardDocument extends IDashboard, Document {
@@ -70,10 +71,10 @@ export interface IReport {
   memberIds: string[];
   tagIds: string[];
 
-  createdAt: Date;
+  createdAt: Date; // Managed by timestamps
   createdBy: string;
 
-  updatedAt: Date;
+  updatedAt: Date; // Managed by timestamps
   updatedBy: string;
 
   serviceName?: string;
@@ -87,6 +88,7 @@ export interface IReport {
   charts?: IChartDocument[];
 
   sectionId?: string;
+  workspace_id?: string; // New
 }
 
 export interface IReportDocument extends IReport, Document {
@@ -97,11 +99,12 @@ export interface ISection {
   name: string;
   type: string;
 
-  createdAt: Date;
+  createdAt: Date; // Managed by timestamps
   createdBy: string;
 
-  updatedAt: Date;
+  updatedAt: Date; // Managed by timestamps
   updatedBy: string;
+  workspace_id?: string; // New
 }
 
 export interface ISectionDocument extends ISection, Document {
@@ -124,16 +127,22 @@ export interface IChart {
 
   vizState: string;
   layout: string;
+
+  createdAt?: Date; // New
+  updatedAt?: Date; // New
 }
 
 export interface IChartDocument extends IChart, Document {
   _id: string;
+  createdAt: Date; // New
+  updatedAt: Date; // New
 }
 
 export const dashboardSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     name: field({ type: String, label: "Name" }),
+    workspace_id: field({ type: String, label: "Workspace ID", index: true, optional: true }), // New
     sectionId: field({ type: String, label: "Section id" }),
     visibility: field({
       type: String,
@@ -167,13 +176,14 @@ export const dashboardSchema = schemaHooksWrapper(
       type: String,
       label: "Last updated by user id"
     })
-  }),
+  }, { timestamps: true }), // Added timestamps
   "erxes_dashboard"
 );
 
 export const reportSchema = new Schema({
   _id: field({ pkey: true }),
   name: field({ type: String, label: "Report name", index: true }),
+  workspace_id: field({ type: String, label: "Workspace ID", index: true, optional: true }), // New
   visibility: field({
     type: String,
     enum: Object.values(IVisibilityType),
@@ -214,6 +224,7 @@ export const sectionSchema = schemaHooksWrapper(
   new Schema({
     _id: field({ pkey: true }),
     name: field({ type: String, label: "Name" }),
+    workspace_id: field({ type: String, label: "Workspace ID", index: true, optional: true }), // New
     type: field({ type: String, label: "Type" }),
     createdAt: field({
       default: Date.now(),
@@ -234,7 +245,7 @@ export const sectionSchema = schemaHooksWrapper(
       type: String,
       label: "Last updated by user id"
     })
-  }),
+  }, { timestamps: true }), // Added timestamps
   "erxes_section"
 );
 
@@ -265,6 +276,6 @@ export const chartSchema = schemaHooksWrapper(
     filter: field({ type: JSON, label: "Filters" }),
     dimension: field({ type: JSON, label: "Dimension" }),
     defaultFilterId: field({ type: String, label: "Default filter id" })
-  }),
+  }, { timestamps: true }), // Added timestamps
   "erxes_insight_chart"
 );

@@ -59,7 +59,8 @@ export const organizationsSchema = new mongoose.Schema({
   amountOff: Number,
   paymentStatus: { type: String },
   paymentStatusMessage: { type: String },
-  teamSize: { type: String },
+  // teamSize: { type: String }, // Removed
+  size: { type: String, enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'], optional: true, label: 'Organization Size' },
   industry: { type: String },
   annualRevenue: { type: String },
   experienceId: { type: String },
@@ -68,7 +69,16 @@ export const organizationsSchema = new mongoose.Schema({
 
   hostNameStatus: { type: String },
   sslStatus: { type: String },
-});
+
+  // New fields
+  legal_name: { type: String, optional: true },
+  tax_id: { type: String, optional: true },
+  address: { type: mongoose.Schema.Types.Mixed, optional: true },
+  billing_address: { type: mongoose.Schema.Types.Mixed, optional: true },
+  website: { type: String, optional: true },
+  primary_color: { type: String, optional: true },
+  secondary_color: { type: String, optional: true },
+}, { timestamps: true }); // Added timestamps option
 
 export const installationSchema = new mongoose.Schema({
   createdAt: { type: Date, label: 'Created at', default: new Date() },

@@ -25,6 +25,7 @@ export interface IDetail {
   firstName?: string;
   middleName?: string;
   lastName?: string;
+  mobile?: string;
 }
 
 export interface IDetailDocument extends IDetail, Document {}
@@ -44,7 +45,8 @@ export interface IUser {
   starredConversationIds?: string[];
   details?: IDetail;
   links?: ILink;
-  isActive?: boolean;
+  // isActive?: boolean; // Replaced by status
+  status?: string; 
   brandIds?: string[];
   groupIds?: string[];
   deviceTokens?: string[];
@@ -60,6 +62,17 @@ export interface IUser {
   positionIds?: string[];
   employeeId?: string;
   chatStatus?: IUserChatStatus;
+
+  // New top-level fields
+  timezone?: string;
+  locale?: string;
+  last_login_at?: Date;
+  last_activity_at?: Date;
+  login_count?: number;
+  phone_verified?: boolean;
+  onboarding_completed?: boolean;
+  onboarding_step?: number;
+  welcome_tour_completed?: boolean;
 }
 
 enum IUserChatStatus {
@@ -74,6 +87,8 @@ export interface IUserDocument extends IUser, Document {
   customPermissions?: IPermissionDocument[];
   role?: string;
   appId?: string;
+  updatedAt: Date; // Added due to timestamps:true
+  displayName?: string; // Added for virtual property
 }
 
 // Mongoose schemas ===============================
@@ -105,6 +120,7 @@ const detailSchema = new Schema(
     firstName: field({ type: String, label: 'First name' }),
     middleName: field({ type: String, label: 'Middle name' }),
     lastName: field({ type: String, label: 'Last name' }),
+  mobile: field({ type: String, optional: true, label: 'Mobile Phone' }),
   },
   { _id: false },
 );
@@ -115,7 +131,7 @@ export const userSchema = schemaWrapper(
     _id: field({ pkey: true }),
     createdAt: field({
       type: Date,
-      default: Date.now,
+      // default: Date.now, // Removed: managed by timestamps:true
       label: 'Created at',
     }),
     username: field({ type: String, label: 'Username' }),
@@ -154,7 +170,14 @@ export const userSchema = schemaWrapper(
     }),
     details: field({ type: detailSchema, default: {}, label: 'Details' }),
     links: field({ type: Object, default: {}, label: 'Links' }),
-    isActive: field({ type: Boolean, default: true, label: 'Is active' }),
+    // isActive: field({ type: Boolean, default: true, label: 'Is active' }), // Removed
+    status: field({ 
+      type: String, 
+      enum: ['active', 'inactive', 'pending', 'suspended'], 
+      default: 'pending', 
+      label: 'Status', 
+      index: true 
+    }),
     brandIds: field({ type: [String], label: 'Brands' }),
     groupIds: field({ type: [String], label: 'Groups' }),
     deviceTokens: field({
@@ -197,8 +220,8 @@ export const userSchema = schemaWrapper(
       type: String,
       label: 'User role',
       optional: true,
-      default: USER_ROLES.USER,
-      enum: USER_ROLES.ALL,
+      default: 'user', // Changed default
+      enum: ['system', 'user', 'super_admin', 'admin', 'manager', 'sales', 'support', 'marketing', 'viewer'], // Updated enum
     }),
     appId: field({
       type: String,
@@ -217,5 +240,28 @@ export const userSchema = schemaWrapper(
       optional: true,
       label: 'User chat status /used for exm/',
     }),
-  }),
+
+    // New top-level fields schema definitions
+    timezone: field({ type: String, optional: true, label: 'Timezone' }),
+    locale: field({ type: String, optional: true, label: 'Locale' }),
+    last_login_at: field({ type: Date, optional: true, label: 'Last Login At' }),
+    last_activity_at: field({ type: Date, optional: true, label: 'Last Activity At' }),
+    login_count: field({ type: Number, optional: true, default: 0, label: 'Login Count' }),
+    phone_verified: field({ type: Boolean, optional: true, default: false, label: 'Phone Verified' }),
+    onboarding_completed: field({ type: Boolean, optional: true, default: false, label: 'Onboarding Completed' }),
+    onboarding_step: field({ type: Number, optional: true, default: 0, label: 'Onboarding Step' }),
+    welcome_tour_completed: field({ type: Boolean, optional: true, default: false, label: 'Welcome Tour Completed' }),
+
+  }, 
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } } // Added options
 );
+
+userSchema.virtual('displayName').get(function(this: IUserDocument) {
+  if (this.details && this.details.firstName && this.details.lastName) {
+    return `${this.details.firstName} ${this.details.lastName}`.trim();
+  }
+  if (this.details && this.details.fullName) { // Fallback to existing fullName
+    return this.details.fullName;
+  }
+  return this.email || this.username || ''; // Further fallback
+});

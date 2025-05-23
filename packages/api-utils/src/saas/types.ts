@@ -5,9 +5,10 @@ export interface IOrganization {
   plan: string;
   expiryDate: string;
   icon: string;
-  teamMembersLimit: number;
+  // teamMembersLimit: number; // Removed
   interval: string;
   charge: any;
+  size?: string; // Added
 
   logo?: string;
   favicon?: string;
@@ -21,7 +22,17 @@ export interface IOrganization {
   lastActiveDate?: Date;
   cronLastExecutedDate?: any;
   createdAt?: Date;
+  updatedAt?: Date; // Added
   promoCodes?: string[];
   partnerKey?: string;
   awsSesAccountStatus?: string;
+
+  // New fields
+  legal_name?: string;
+  tax_id?: string;
+  address?: any; 
+  billing_address?: any;
+  website?: string;
+  primary_color?: string;
+  secondary_color?: string;
 }
